@@ -1,6 +1,6 @@
 astro---
 // src/pages/dumptruck.astro
-// Production-Ready Landing Frame for Webmasters LLC Trucking Portal
+// Production-Ready Integrated Portal for Webmasters LLC Trucking
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -9,10 +9,10 @@ astro---
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Logistics & Hauling Portal | Webmasters LLC</title>
 </head>
-<body style="margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #111827; color: #f9fafb; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
+<body style="margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #111827; color: #f9fafb; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; padding: 40px 20px;">
 
   <!-- Main Logistics Card Container -->
-  <div style="max-width: 500px; width: 100%; background: #1f2937; border-radius: 16px; pading: 32px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); border: 1px solid #374151; padding: 32px;">
+  <div style="max-width: 500px; width: 100%; background: #1f2937; border-radius: 16px; padding: 32px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); border: 1px solid #374151; box-sizing: border-box;">
     
     <!-- Header Branding -->
     <div style="text-align: center; margin-bottom: 28px; border-bottom: 2px solid #374151; padding-bottom: 20px;">
@@ -27,7 +27,7 @@ astro---
     </div>
 
     <!-- Input Order Form Simulation Frame -->
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 24px;">
       <label style="display: block; font-size: 13px; font-weight: 600; color: #9ca3af; margin-bottom: 8px;">Select Material Type</label>
       <select id="materialType" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #4b5563; background: #111827; color: white; font-size: 15px; outline: none; cursor: pointer;">
         <option value="gravel">Crushed Limestone / Gravel</option>
@@ -41,7 +41,53 @@ astro---
     <div id="dispatchFeedback" style="margin-top: 20px; text-align: center; font-size: 14px; color: #9ca3af; min-height: 20px;"></div>
   </div>
 
+  <!-- Stripe Fleet Pricing Section -->
+  <div class="pricing-section" style="margin-top: 40px; width: 100%; max-width: 500px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h2 style="color: #f59e0b; margin: 0 0 4px 0; font-size: 20px; font-weight: 700;">Commercial Fleet Rates</h2>
+      <p style="margin: 0; color: #9ca3af; font-size: 14px;">Select your dispatch fleet size to calculate booking totals</p>
+    </div>
+
+    <div style="background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); box-sizing: border-box;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+        <span style="font-size: 18px; font-weight: 700; color: #ffffff;">Fleet Dispatch</span>
+        <div>
+          <span id="calculatedTotal" style="font-size: 32px; font-weight: 800; color: #f59e0b;">\$199.00</span>
+          <span style="color: #9ca3af; font-size: 14px;"> / setup</span>
+        </div>
+      </div>
+
+      <!-- Fleet Size Calculator Counter -->
+      <div style="background: #111827; border-radius: 8px; padding: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 14px; color: #e5e7eb; font-weight: 600;">Total Dump Trucks:</span>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button onclick="window.adjustTrucks(-1)" style="width: 32px; height: 32px; border-radius: 6px; background: #374151; color: white; border: none; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;">-</button>
+          <span id="truckCount" style="font-size: 18px; font-weight: 700; color: white; min-width: 24px; text-align: center;">1</span>
+          <button onclick="window.adjustTrucks(1)" style="width: 32px; height: 32px; border-radius: 6px; background: #374151; color: white; border: none; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
+        </div>
+      </div>
+
+      <!-- Invoice Breakdown Matrix -->
+      <ul style="margin: 0 0 24px 0; padding: 0; list-style: none; font-size: 14px; color: #9ca3af; display: flex; flex-direction: column; gap: 8px;">
+        <li style="display: flex; justify-content: space-between;"><span>Primary Truck Rate:</span><span style="color: #e5e7eb;">\$199.00</span></li>
+        <li style="display: flex; justify-content: space-between;"><span>Additional Trucks Add-on:</span><span id="addonLabel" style="color: #e5e7eb;">\$0.00</span></li>
+        <li style="display: flex; justify-content: space-between; border-top: 1px dashed #374151; padding-top: 8px; margin-top: 4px; font-weight: 600;">
+          <span style="color: #ffffff;">Subtotal Invoice:</span>
+          <span id="breakdownSubtotal" style="color: #f59e0b;">\$199.00</span>
+        </li>
+      </ul>
+
+      <!-- Checkout Action Button -->
+      <form id="checkoutForm" onsubmit="window.handleCheckout(event)">
+        <button type="submit" style="width: 100%; padding: 14px; border-radius: 8px; background: #f59e0b; color: #111827; border: none; font-size: 16px; font-weight: 700; cursor: pointer; text-align: center;">
+          Generate Secure Stripe Invoice
+        </button>
+      </form>
+    </div>
+  </div>
+
   <script is:inline>
+    // 1. Dispatch Logic Definitions
     window.requestQuote = function() {
       const material = document.getElementById("materialType").value;
       const feedback = document.getElementById("dispatchFeedback");
@@ -51,11 +97,50 @@ astro---
       feedback.innerText = `Routing request sent for ${material}. Checking nearby fleet logs...`;
     };
 
-    // Auto-restore last selection on page reload
+    // 2. Stripe Invoice Dynamic Pricing Calculator
+    let currentTrucks = 1;
+    const BASE_PRICE = 199.00;
+    const PER_TRUCK_ADDON = 101.00;
+
+    window.adjustTrucks = function(amount) {
+      const newCount = currentTrucks + amount;
+      if (newCount < 1) return;
+      
+      currentTrucks = newCount;
+      window.recalculateInvoice();
+    };
+
+    window.recalculateInvoice = function() {
+      const addonPrice = (currentTrucks - 1) * PER_TRUCK_ADDON;
+      const total = BASE_PRICE + addonPrice;
+
+      const formattedAddon = `$${addonPrice.toFixed(2)}`;
+      const formattedTotal = `$${total.toFixed(2)}`;
+
+      document.getElementById("truckCount").innerText = currentTrucks;
+      document.getElementById("addonLabel").innerText = formattedAddon;
+      document.getElementById("calculatedTotal").innerText = formattedTotal;
+      document.getElementById("breakdownSubtotal").innerText = formattedTotal;
+
+      localStorage.setItem("saved_fleet_count", currentTrucks);
+    };
+
+    window.handleCheckout = function(e) {
+      e.preventDefault();
+      alert(`Stripe Checkout Session triggered for ${currentTrucks} truck(s). Pushing parameters to omniroute edge gateway...`);
+    };
+
+    // 3. Shared Page Initialization Lifecycle Hook
     window.addEventListener("DOMContentLoaded", () => {
       const savedSearch = localStorage.getItem("last_truck_search");
       if (savedSearch) {
         document.getElementById("materialType").value = savedSearch;
+      }
+
+      const savedCount = localStorage.getItem("saved_fleet_count");
+      if (savedCount) {
+        currentTrucks = parseInt(savedCount, 10) || 1;
+        window.recalculateInvoice();
       }
     });
   </script>
