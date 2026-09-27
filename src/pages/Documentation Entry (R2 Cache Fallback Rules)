@@ -1,0 +1,17 @@
+## 🧠 R2 Media Cache Fallback Pipeline Rules
+
+When an incoming POST request hits the `petneeds-avatar-api` endpoint, the system evaluates asset availability based on the following fallback layers:
+
+1. **LAYER 1: Normalized Normalization Lookup (Deterministic Key)**
+   - The user query string is stripped of capitalization, whitespace, and special characters.
+   - A SHA-256 hash of this cleaned string forms the file payload name (e.g., `hash.mp4`).
+
+2. **LAYER 2: Cloudflare R2 Check (Storage Bucket Hit)**
+   - The Worker executes `env.MEDIA_CACHE.get(cacheKey)`.
+   - **HIT:** The binary video array is fetched out of object storage and streamed directly back to the Astro frontend container. 
+
+3. **LAYER 3: Compute & Render Pipeline (Storage Bucket Miss)**
+   - If `env.MEDIA_CACHE.get()` returns empty, a Cache Miss is declared.
+   - The Worker falls back to Cloudflare Workers AI using the `@cf/meta/llama-3-8b-instruct` model to write a child-safe training text script.
+   - The text script is dispatched to your open-source media engines to generate fresh synchronized voice and video data.
+   - The output stream is saved to R2 via `env.MEDIA_CACHE.put()` for subsequent hits, then served to the client browser.
