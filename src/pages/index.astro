@@ -1,0 +1,109 @@
+---
+// src/pages/index.astro
+// Astro Component for PetNeeds.ai - Simple Child Trainer Interface
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetNeeds.ai - Train Your Dog!</title>
+</head>
+<body style="margin: 0; font-family: system-ui, sans-serif; background: #1e2124; color: #f1f2f6; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;">
+
+  <h1 style="color: #ff4757; margin-bottom: 5px;">🐶 PetNeeds.ai 🐶</h1>
+  <p style="margin: 0 0 20px 0; color: #747d8c;">Learn how to teach your puppy awesome new tricks!</p>
+
+  <!-- Dual-Layer Video / Idle Canvas Container -->
+  <div style="position: relative; width: 380px; height: 380px; background: #2f3136; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+    
+    <!-- Base Idle Animated Graphic -->
+    <div id="idleAvatar" style="position: absolute; width: 100%; height: 100%; background: #333; display: flex; align-items: center; justify-content: center; font-size: 80px; animation: breathe 4s ease-in-out infinite;">
+      🧒🧑
+    </div>
+
+    <!-- Active Media Stream Container -->
+    <video id="avatarPlayer" playsinline style="position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 2;"></video>
+    
+    <!-- Loading Overlay -->
+    <div id="statusOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 3;">
+      <div style="border: 4px solid rgba(255,255,255,0.1); border-left-color: #ff4757; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+      <p style="margin-top: 15px; font-size: 14px; font-weight: bold;">Trainer is thinking...</p>
+    </div>
+  </div>
+
+  <!-- Dynamic Response Script Text Area -->
+  <div id="subtitleBox" style="max-width: 380px; margin: 20px auto; text-align: center; font-size: 16px; min-height: 24px; color: #ced6e0;"></div>
+
+  <!-- Command Action Box -->
+  <div style="display: flex; gap: 10px; margin-top: 10px;">
+    <input type="text" id="userInput" placeholder="Ask how to teach sit, stay, come..." style="padding: 12px; width: 240px; border-radius: 8px; border: none; background: #2f3136; color: white; outline: none;" />
+    <button onclick="askTrainer()" style="padding: 12px 20px; border-radius: 8px; background: #ff4757; color: white; border: none; font-weight: bold; cursor: pointer;">Ask</button>
+  </div>
+
+  <style>
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script is:inline>
+    // Route directly to your deployed Worker endpoint path
+    const WORKER_API = "https://workers.dev";
+    
+    const player = document.getElementById("avatarPlayer");
+    const idle = document.getElementById("idleAvatar");
+    const overlay = document.getElementById("statusOverlay");
+    const subtitle = document.getElementById("subtitleBox");
+
+    async function askTrainer() {
+      const inputField = document.getElementById("userInput");
+      const text = inputField.value.trim();
+      if (!text) return;
+
+      // Show loader
+      overlay.style.display = "flex";
+      subtitle.innerText = "";
+
+      try {
+        const response = await fetch(WORKER_API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userMessage: text })
+        });
+
+        if (!response.ok) throw new Error("Network error");
+
+        // Process binary video clip direct from R2/Cache
+        const videoBlob = await response.blob();
+        const videoUrl = URL.createObjectURL(videoBlob);
+
+        // Hide overlay & toggle player layers
+        overlay.style.display = "none";
+        idle.style.display = "none";
+        player.style.display = "block";
+        
+        player.src = videoUrl;
+        player.play();
+
+      } catch (err) {
+        console.error(err);
+        overlay.style.display = "none";
+        subtitle.innerText = "Oops! Your trainer lost connection. Let's try again!";
+      }
+    }
+
+    // Automatically return to idle state when video finishes
+    player.addEventListener("ended", () => {
+      player.style.display = "none";
+      idle.style.display = "flex";
+      player.src = "";
+    });
+  </script>
+</body>
+</html>
