@@ -1,0 +1,64 @@
+astro---
+// src/pages/dumptruck.astro
+// Production-Ready Landing Frame for Webmasters LLC Trucking Portal
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logistics & Hauling Portal | Webmasters LLC</title>
+</head>
+<body style="margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #111827; color: #f9fafb; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
+
+  <!-- Main Logistics Card Container -->
+  <div style="max-width: 500px; width: 100%; background: #1f2937; border-radius: 16px; pading: 32px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); border: 1px solid #374151; padding: 32px;">
+    
+    <!-- Header Branding -->
+    <div style="text-align: center; margin-bottom: 28px; border-bottom: 2px solid #374151; padding-bottom: 20px;">
+      <h1 style="color: #f59e0b; margin: 0 0 6px 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">🚛 Webmasters LLC 🚛</h1>
+      <p style="margin: 0; color: #9ca3af; font-size: 15px;">Dump Truck Logistics & Material Hauling Matrix</p>
+    </div>
+
+    <!-- Active Status Board -->
+    <div style="background: #111827; border-left: 4px solid #f59e0b; border-radius: 4px; padding: 16px; margin-bottom: 24px;">
+      <div style="font-size: 11px; text-transform: uppercase; color: #f59e0b; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px;">System Dispatch Status</div>
+      <p style="margin: 0; font-size: 15px; color: #e5e7eb; line-height: 1.5;">Missouri operations loop fully active. Ready to route local aggregate, gravel, and construction site hauls.</p>
+    </div>
+
+    <!-- Input Order Form Simulation Frame -->
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; font-size: 13px; font-weight: 600; color: #9ca3af; margin-bottom: 8px;">Select Material Type</label>
+      <select id="materialType" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #4b5563; background: #111827; color: white; font-size: 15px; outline: none; cursor: pointer;">
+        <option value="gravel">Crushed Limestone / Gravel</option>
+        <option value="dirt">Clean Fill Dirt / Topsoil</option>
+        <option value="asphalt">Asphalt Milling</option>
+      </select>
+    </div>
+
+    <button onclick="window.requestQuote()" style="width: 100%; padding: 14px; border-radius: 8px; background: #f59e0b; color: #111827; border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s;">Calculate Dispatch Route</button>
+
+    <div id="dispatchFeedback" style="margin-top: 20px; text-align: center; font-size: 14px; color: #9ca3af; min-height: 20px;"></div>
+  </div>
+
+  <script is:inline>
+    window.requestQuote = function() {
+      const material = document.getElementById("materialType").value;
+      const feedback = document.getElementById("dispatchFeedback");
+      
+      localStorage.setItem("last_truck_search", material);
+      feedback.style.color = "#f59e0b";
+      feedback.innerText = `Routing request sent for ${material}. Checking nearby fleet logs...`;
+    };
+
+    // Auto-restore last selection on page reload
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedSearch = localStorage.getItem("last_truck_search");
+      if (savedSearch) {
+        document.getElementById("materialType").value = savedSearch;
+      }
+    });
+  </script>
+</body>
+</html>
+Use code with caution.
